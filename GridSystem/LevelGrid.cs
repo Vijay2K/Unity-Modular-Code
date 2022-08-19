@@ -11,7 +11,7 @@ public class LevelGrid : MonoBehaviour
     [SerializeField] private int cellSize = 2;
     [SerializeField] private Transform gridDebuggerTransform;
 
-    private GridSystem gridSystem;
+    private GridSystem<GridObject> gridSystem;
 
     private void Awake() 
     {
@@ -28,8 +28,10 @@ public class LevelGrid : MonoBehaviour
 
     private void Start() 
     {
-        gridSystem = new GridSystem(width, height, cellSize);
-        gridSystem.CreateGridDebugObject(gridDebuggerTransform, this.transform);
+        gridSystem = new GridSystem<GridObject>(width, height, cellSize, 
+                (GridSystem<GridObject> gridSystem, GridPosition gridPosition) => new GridObject(gridSystem, gridPosition));
+
+        //gridSystem.CreateGridDebugObject(gridDebuggerTransform);
     }
 
     public GridPosition GetGridPosition(Vector3 worldPosition)
@@ -50,5 +52,15 @@ public class LevelGrid : MonoBehaviour
     public bool GetIsValidGridPosition(GridPosition gridPosition)
     {
         return gridSystem.IsValidGridPosition(gridPosition);
+    }
+
+    public int GetWidth()
+    {
+        return gridSystem.GetWidth();
+    }
+
+    public int GetHeight()
+    {
+        return gridSystem.GetHeight();
     }
 }

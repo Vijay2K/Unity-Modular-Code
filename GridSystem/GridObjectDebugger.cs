@@ -7,15 +7,14 @@ public class GridObjectDebugger : MonoBehaviour
 {
     [SerializeField] private TextMeshPro debugText;
 
-    private GridObject gridObject;
+    private object gridObject;
 
-    public void SetGridObject(GridObject gridObject)
+    public virtual void SetGridObject(object gridObject)
     {
         this.gridObject = gridObject;
-        SetupText();
     }
 
-    private void SetupText()
+    protected virtual void Update() 
     {
         debugText.text = gridObject.ToString();
     }

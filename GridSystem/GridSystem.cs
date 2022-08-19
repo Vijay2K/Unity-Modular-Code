@@ -1,28 +1,30 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridSystem
+public class GridSystem<TGridObject>
 {
     private int width;
     private int height;
     private int cellSize;
-    private GridObject[,] gridObjectsArray;
+    private TGridObject[,] gridObjectsArray;
 
-    public GridSystem(int width, int height, int cellSize)
+    public GridSystem(int width, int height, int cellSize, 
+                Func<GridSystem<TGridObject>, GridPosition , TGridObject> CreateGridObject)
     {
         this.width = width;
         this.height = height;
         this.cellSize = cellSize;
 
-        gridObjectsArray = new GridObject[width, height];
+        gridObjectsArray = new TGridObject[width, height];
 
         for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
             {
                 GridPosition gridPosition = new GridPosition(x, z);
-                gridObjectsArray[x, z] = new GridObject(this, gridPosition);
+                gridObjectsArray[x, z] = CreateGridObject(this, gridPosition);
             }
         }
     }
@@ -42,19 +44,19 @@ public class GridSystem
         return new GridPosition(Mathf.RoundToInt(worldPosition.x / cellSize), Mathf.RoundToInt(worldPosition.z / cellSize));
     }
 
-    private GridObject GetGridObject(GridPosition gridPosition)
+    public TGridObject GetGridObject(GridPosition gridPosition)
     {
         return gridObjectsArray[gridPosition.x, gridPosition.z];
     }
 
-    public void CreateGridDebugObject(Transform gridDebuggerTransform, Transform spawnTransform)
+    public void CreateGridDebugObject(Transform gridDebuggerTransform)
     {
         for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
             {
                 GridPosition gridPosition = new GridPosition(x, z);
-                Transform gridDebuggerTransformInstance = GameObject.Instantiate(gridDebuggerTransform,spawnTransform.position+ GetWorldPosition3D(gridPosition) , Quaternion.identity);
+                Transform gridDebuggerTransformInstance = GameObject.Instantiate(gridDebuggerTransform, GetWorldPosition3D(gridPosition) , Quaternion.identity);
                 if(gridDebuggerTransformInstance.TryGetComponent<GridObjectDebugger>(out GridObjectDebugger debugger))
                 {
                     debugger.SetGridObject(GetGridObject(gridPosition));
@@ -76,6 +78,6 @@ public class GridSystem
         return false;
     }
 
-    private int GetWidth() => width;
-    private int GetHeight() => height;    
+    public int GetWidth() => width;
+    public int GetHeight() => height;    
 }
